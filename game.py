@@ -1,4 +1,5 @@
 import pygame
+import pygame_menu
 from pygame.locals import *
 import sys
 
@@ -24,10 +25,15 @@ class Game:
         for h in range(1, 8):
             for n in self.notes:
                 path = f"piano-mp3/{n}{h}.mp3"
-                self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)
-                
+                self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)       
 
-    def menu(self):
+        self.menu = pygame_menu.Menu('Welcome', 400, 300,
+                                    theme=pygame_menu.themes.THEME_BLUE)
+        self.menu.add.text_input('Name :', default='Piano')
+        self.menu.add.button('Play', self.play)
+        self.menu.add.button('Quit', pygame_menu.events.EXIT)
+
+    """ def menu(self):
         mouse = pygame.mouse.get_pos()
         self.screen.fill((30, 30, 30))
         pygame.draw.rect(self.screen, (10,10,10), [self.width/2-250, self.height/2-300, 500, 150])
@@ -45,8 +51,20 @@ class Game:
                 pygame.quit()
                 sys.exit()
             if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
+                mouse = pygame.mouse.get_pos()
+                play_hover = play_rect.collidepoint(mouse)
+                quit_hover = quit_rect.collidepoint(mouse)
+                
                 if play_hover:
                     self.play()
+                    waiting = True
+                    while waiting:
+                        for event in pygame.event.get():
+                            if event.type == pygame.MOUSEBUTTONUP:
+                                waiting = False
+                            elif event.type == pygame.QUIT:
+                                pygame.quit()
+                                sys.exit()
                 if quit_hover:
                     pygame.quit()
                     sys.exit()
@@ -75,7 +93,7 @@ class Game:
         self.screen.blit(text1, text1_rect)
         self.screen.blit(text2, text2_rect) 
        
-        pygame.display.flip()
+        pygame.display.flip() """
 
     def play(self):
         run = True
@@ -167,7 +185,7 @@ class Game:
                     self.running = False
 
             self.screen.fill(self.bg)
-            self.menu()
+            self.menu.mainloop(self.screen)
             pygame.display.flip()
 
         pygame.quit()
