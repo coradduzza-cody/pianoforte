@@ -1,5 +1,6 @@
 import pygame
 import pygame_menu
+import pygame.gfxdraw
 from pygame.locals import *
 import sys
 
@@ -29,75 +30,13 @@ class Game:
 
         self.menu = pygame_menu.Menu('Welcome', 400, 300,
                                     theme=pygame_menu.themes.THEME_BLUE)
-        self.menu.add.text_input('Name :', default='Piano')
+        self.menu.add.text_input('Name :', default=' ')
         self.menu.add.button('Play', self.play)
         self.menu.add.button('Quit', pygame_menu.events.EXIT)
 
-    """ def menu(self):
-        mouse = pygame.mouse.get_pos()
-        self.screen.fill((30, 30, 30))
-        pygame.draw.rect(self.screen, (10,10,10), [self.width/2-250, self.height/2-300, 500, 150])
-
-        # Play button
-        play_rect = pygame.Rect(self.width/2-80, self.height/2-80, 140, 40)
-        # Quit button
-        quit_rect = pygame.Rect(self.width/2-80, self.height/2-20, 140, 40)
-
-        play_hover = play_rect.collidepoint(mouse)
-        quit_hover = quit_rect.collidepoint(mouse)
-
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                pygame.quit()
-                sys.exit()
-            if event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                mouse = pygame.mouse.get_pos()
-                play_hover = play_rect.collidepoint(mouse)
-                quit_hover = quit_rect.collidepoint(mouse)
-                
-                if play_hover:
-                    self.play()
-                    waiting = True
-                    while waiting:
-                        for event in pygame.event.get():
-                            if event.type == pygame.MOUSEBUTTONUP:
-                                waiting = False
-                            elif event.type == pygame.QUIT:
-                                pygame.quit()
-                                sys.exit()
-                if quit_hover:
-                    pygame.quit()
-                    sys.exit()
-
-        if play_hover:
-            pygame.draw.rect(self.screen, (255, 255, 255), play_rect)
-        else:
-            pygame.draw.rect(self.screen, (200, 200, 200), play_rect)
-
-        if quit_hover:
-            pygame.draw.rect(self.screen, (255, 255, 255), quit_rect)
-        else:
-            pygame.draw.rect(self.screen, (200, 200, 200), quit_rect)
-
-        font = pygame.font.Font(None, 36)
-        title = font.render("Piano Simulator", True, (255, 255, 255))
-        text1 = font.render("Play", True, (255, 0, 0))
-        text2 = font.render("Quit", True, (255, 0, 0))
-
-        # Center the text within the rectangles
-        title_rect = title.get_rect(center=(self.width / 2, self.height / 2 - 225))
-        text1_rect = text1.get_rect(center=(self.width/2 - 80 + 140/2, self.height/2 - 80 + 40/2))
-        text2_rect = text2.get_rect(center=(self.width/2 - 80 + 140/2, self.height/2 - 20 + 40/2))
-
-        self.screen.blit(title, title_rect)
-        self.screen.blit(text1, text1_rect)
-        self.screen.blit(text2, text2_rect) 
-       
-        pygame.display.flip() """
-
     def play(self):
         run = True
-        sound_hight = 4
+        sound_height = 4
 
         font = pygame.font.Font(None, 50)
 
@@ -120,42 +59,46 @@ class Game:
             def key_just_pressed(key):
                 return keys[key] and not prev_keys[key]
 
+            if pygame.mouse.get_pressed()[0]:  # Left mouse button
+                POS = pygame.mouse.get_pos()
+                print(POS)
+
             if keys[pygame.K_RIGHT]:
-                if sound_hight < 7:
-                    sound_hight += 1
-                print(sound_hight)
+                if sound_height < 7:
+                    sound_height += 1
+                print(sound_height)
                 pygame.time.delay(200)
 
             if keys[pygame.K_LEFT]:
-                if sound_hight > 1:
-                    sound_hight -= 1
-                print(sound_hight)
+                if sound_height > 1:
+                    sound_height -= 1
+                print(sound_height)
                 pygame.time.delay(200)
 
             if key_just_pressed(pygame.K_q):
-                note_name = f"C{sound_hight}"
+                note_name = f"C{sound_height}"
             elif key_just_pressed(pygame.K_2):
-                note_name = f"Db{sound_hight}"
+                note_name = f"Db{sound_height}"
             elif key_just_pressed(pygame.K_w):
-                note_name = f"D{sound_hight}"
+                note_name = f"D{sound_height}"
             elif key_just_pressed(pygame.K_3):
-                note_name = f"Eb{sound_hight}"
+                note_name = f"Eb{sound_height}"
             elif key_just_pressed(pygame.K_e):
-                note_name = f"E{sound_hight}"
+                note_name = f"E{sound_height}"
             elif key_just_pressed(pygame.K_r):
-                note_name = f"F{sound_hight}"
+                note_name = f"F{sound_height}"
             elif key_just_pressed(pygame.K_5):
-                note_name = f"Gb{sound_hight}"
+                note_name = f"Gb{sound_height}"
             elif key_just_pressed(pygame.K_t):
-                note_name = f"G{sound_hight}"
+                note_name = f"G{sound_height}"
             elif key_just_pressed(pygame.K_6):
-                note_name = f"Ab{sound_hight}"
+                note_name = f"Ab{sound_height}"
             elif key_just_pressed(pygame.K_y):
-                note_name = f"A{sound_hight}"
+                note_name = f"A{sound_height}"
             elif key_just_pressed(pygame.K_7):
-                note_name = f"Bb{sound_hight}"
+                note_name = f"Bb{sound_height}"
             elif key_just_pressed(pygame.K_u):
-                note_name = f"B{sound_hight}"
+                note_name = f"B{sound_height}"
 
             if note_name and note_name in self.sounds:
                 self.sounds[note_name].play()
@@ -178,6 +121,12 @@ class Game:
             pygame.display.flip()
             prev_keys = keys  # Update previous keys for next frame
 
+            #keyboard
+            pianoImg = pygame.image.load("images/piano_keys.png")
+            pianoImg = pygame.transform.scale(pianoImg, (900, 300))
+
+
+
     def run(self):
         while self.running:
             for event in pygame.event.get():
@@ -194,5 +143,3 @@ class Game:
 if __name__ == "__main__":
     game = Game()
     game.run()
-
-    print("meow meow")
