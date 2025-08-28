@@ -5,6 +5,9 @@ from pygame.locals import *
 import sys
 
 class Game:
+
+# INIZIALIZZAZIONE GIOCO
+
     def __init__(self):
         pygame.init()
         pygame.mixer.init()
@@ -28,11 +31,25 @@ class Game:
                 path = f"piano-mp3/{n}{h}.mp3"
                 self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)       
 
-        self.menu = pygame_menu.Menu('Welcome', 400, 300,
+    # MENU' SETUP
+
+        self.menu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
                                     theme=pygame_menu.themes.THEME_BLUE)
-        self.menu.add.text_input('Name :', default=' ')
-        self.menu.add.button('Play', self.play)
-        self.menu.add.button('Quit', pygame_menu.events.EXIT)
+        
+        self.menu.add.text_input('Name : ', default='Player', font_size=30, font_color=(0, 0, 0), 
+                                 background_color=(180, 191, 209)
+                                 ,margin=(0, 20)
+                                 ,padding=(10, 20))
+        self.menu.add.button('Play', self.play, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        self.menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+
+# FUNZIONAMENTO GIOCO
 
     def play(self):
         run = True
@@ -43,6 +60,13 @@ class Game:
         # Track which keys were pressed last frame
         prev_keys = pygame.key.get_pressed()
 
+    #CARICAMENTO IMMAGINE PIANO
+
+        pianoImg = pygame.image.load("images/piano_keys.jpg")
+        pianoImg = pygame.transform.scale(pianoImg, (900, 300))
+
+    # LOOP PRINCIPALE
+
         while run:
             for event in pygame.event.get():
                 if event.type == pygame.QUIT:
@@ -52,16 +76,17 @@ class Game:
 
             self.screen.fill(self.bg)
 
+            # Always draw the piano image every frame
+            self.screen.blit(pianoImg, (50, 250))
+
+        # GESTIONE e DISPLAY INPUT 
+
             keys = pygame.key.get_pressed()
             note_name = ""
 
             # Only play sound on key DOWN event (not while held)
             def key_just_pressed(key):
                 return keys[key] and not prev_keys[key]
-
-            if pygame.mouse.get_pressed()[0]:  # Left mouse button
-                POS = pygame.mouse.get_pos()
-                print(POS)
 
             if keys[pygame.K_RIGHT]:
                 if sound_height < 7:
@@ -74,6 +99,8 @@ class Game:
                     sound_height -= 1
                 print(sound_height)
                 pygame.time.delay(200)
+
+        # MAPPA TASTI (da sostituire con mouse click)
 
             if key_just_pressed(pygame.K_q):
                 note_name = f"C{sound_height}"
@@ -103,9 +130,6 @@ class Game:
             if note_name and note_name in self.sounds:
                 self.sounds[note_name].play()
 
-            # Clear the area where the note name is displayed
-            pygame.draw.rect(self.screen, self.bg, (self.width / 2 - 100, self.height / 2 - 250, 200, 50))
-
             # Always render the current note name (or blank if none)
             # Accumulate all played notes in a string
             if not hasattr(self, "played_notes"):
@@ -114,18 +138,23 @@ class Game:
                 self.played_notes += note_name + " "
 
             display_notes = self.played_notes.strip()
+
             title = font.render(display_notes, True, (0, 0, 0))
             title_rect = title.get_rect(center=(self.width / 2, self.height / 2 - 225))
             self.screen.blit(title, title_rect)
 
-            pygame.display.flip()
             prev_keys = keys  # Update previous keys for next frame
 
-            #keyboard
-            pianoImg = pygame.image.load("images/piano_keys.png")
-            pianoImg = pygame.transform.scale(pianoImg, (900, 300))
+            pygame.display.flip()
+            
+        #TRACKING MOUSE 
 
+            if pygame.mouse.get_pressed()[0]:  # Left mouse button
+                POS = pygame.mouse.get_pos()
+                print(POS)
+            pygame.display.update()
 
+# LOOP MENU
 
     def run(self):
         while self.running:
