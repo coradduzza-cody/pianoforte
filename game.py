@@ -60,7 +60,7 @@ class Game:
         # Track which keys were pressed last frame
         prev_keys = pygame.key.get_pressed()
 
-    #CARICAMENTO IMMAGINE PIANO
+    # CARICAMENTO IMMAGINE PIANO
 
         pianoImg = pygame.image.load("images/piano_keys.jpg")
         pianoImg = pygame.transform.scale(pianoImg, (900, 300))
@@ -126,9 +126,54 @@ class Game:
                 note_name = f"Bb{sound_height}"
             elif key_just_pressed(pygame.K_u):
                 note_name = f"B{sound_height}"
+            
+        # TRACKING MOUSE 
 
-            if note_name and note_name in self.sounds:
-                self.sounds[note_name].play()
+            if pygame.mouse.get_pressed()[0]:  # Left mouse button
+                pos = pygame.mouse.get_pos()
+                print(pos)
+
+        # PROVA MAPPATURA TASTI e CLICK
+
+            cPoint = [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)]
+            ddPoint = [(145, 420), (210, 420), (210, 250), (145, 250)]
+            dPoint = [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)]
+
+            cTile = pygame.draw.polygon(self.screen, (25, 120, 60), cPoint, 3)
+            ddTile = pygame.draw.polygon(self.screen, (255, 0, 0), ddPoint, 3)
+            dTile = pygame.draw.polygon(self.screen, (25, 120, 60), dPoint, 3)
+
+            if cTile.collidepoint(pygame.mouse.get_pos()):
+                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], cPoint):
+                    note_name = f"C{sound_height}"
+                    if note_name in self.sounds:
+                        self.sounds[note_name].play()
+                    print("C")
+                    pygame.time.delay(200)
+
+            if ddTile.collidepoint(pygame.mouse.get_pos()):
+                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], ddPoint):
+                    note_name = f"Db{sound_height}"
+                    if note_name in self.sounds:
+                        self.sounds[note_name].play()
+                    print("Db")
+                    pygame.time.delay(200)
+            
+            if dTile.collidepoint(pygame.mouse.get_pos()):
+                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], dPoint):
+                    note_name = f"D{sound_height}"
+                    if note_name in self.sounds:
+                        self.sounds[note_name].play()
+                    print("D")
+                    pygame.time.delay(200)
+
+        # DISEGNO TASTI PREMUTI 
+
+            """ pygame.gfxdraw.filled_polygon(self.screen, cPoint, (189, 189, 189))
+            pygame.gfxdraw.filled_polygon(self.screen, (255, 0, 0), ddPoint, (189, 189, 189))
+            pygame.gfxdraw.filled_polygon(self.screen, (25, 120, 60), dPoint, (189, 189, 189)) """
+
+        # DISPLAY TASTI PREMUTI
 
             # Always render the current note name (or blank if none)
             # Accumulate all played notes in a string
@@ -144,26 +189,21 @@ class Game:
             self.screen.blit(title, title_rect)
 
             prev_keys = keys  # Update previous keys for next frame
-            
-        # TRACKING MOUSE 
-
-            if pygame.mouse.get_pressed()[0]:  # Left mouse button
-                POS = pygame.mouse.get_pos()
-                print(POS)
-
-        # PROVA MAPPATURA TASTI
-
-            pygame.draw.polygon(self.screen, (25, 120, 60), [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)], 3)
-            pygame.draw.polygon(self.screen, (255, 0, 0), [(145, 420), (210, 420), (210, 250), (145, 250)], 3)
-            pygame.draw.polygon(self.screen, (25, 120, 60), [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)], 3)
-
-        # DISEGNO TASTI PREMUTI 
-
-            """ pygame.gfxdraw.filled_polygon(self.screen, [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)], (189, 189, 189))
-            pygame.gfxdraw.filled_polygon(self.screen, (255, 0, 0), [(145, 420), (210, 420), (210, 250), (145, 250)], (189, 189, 189))
-            pygame.gfxdraw.filled_polygon(self.screen, (25, 120, 60), [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)], (189, 189, 189)) """
 
             pygame.display.update()
+
+# FUNZIONE PER CAPIRE SE UN PUNTO FA PARTE DELLA NOTA
+
+    def point_in_polygon(self, x, y, poly):
+        num = len(poly)
+        j = num - 1
+        c = False
+        for i in range(num):
+            if ((poly[i][1] > y) != (poly[j][1] > y)) and \
+            (x < (poly[j][0] - poly[i][0]) * (y - poly[i][1]) / (poly[j][1] - poly[i][1] + 1e-10) + poly[i][0]):
+                c = not c
+            j = i
+        return c
 
 # LOOP MENU
 
