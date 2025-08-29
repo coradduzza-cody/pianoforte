@@ -144,14 +144,25 @@ class Game:
             self.screen.blit(title, title_rect)
 
             prev_keys = keys  # Update previous keys for next frame
-
-            pygame.display.flip()
             
-        #TRACKING MOUSE 
+        # TRACKING MOUSE 
 
             if pygame.mouse.get_pressed()[0]:  # Left mouse button
                 POS = pygame.mouse.get_pos()
                 print(POS)
+
+        # PROVA MAPPATURA TASTI
+
+            pygame.draw.polygon(self.screen, (25, 120, 60), [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)], 3)
+            pygame.draw.polygon(self.screen, (255, 0, 0), [(145, 420), (210, 420), (210, 250), (145, 250)], 3)
+            pygame.draw.polygon(self.screen, (25, 120, 60), [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)], 3)
+
+        # DISEGNO TASTI PREMUTI 
+
+            """ pygame.gfxdraw.filled_polygon(self.screen, [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)], (189, 189, 189))
+            pygame.gfxdraw.filled_polygon(self.screen, (255, 0, 0), [(145, 420), (210, 420), (210, 250), (145, 250)], (189, 189, 189))
+            pygame.gfxdraw.filled_polygon(self.screen, (25, 120, 60), [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)], (189, 189, 189)) """
+
             pygame.display.update()
 
 # LOOP MENU
