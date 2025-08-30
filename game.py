@@ -34,12 +34,8 @@ class Game:
     # MENU' SETUP
 
         self.menu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
-                                    theme=pygame_menu.themes.THEME_BLUE)
+                                    theme=pygame_menu.themes.THEME_DARK)
         
-        self.menu.add.text_input('Name : ', default='Player', font_size=30, font_color=(0, 0, 0), 
-                                 background_color=(180, 191, 209)
-                                 ,margin=(0, 20)
-                                 ,padding=(10, 20))
         self.menu.add.button('Play', self.play, font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
@@ -59,6 +55,9 @@ class Game:
 
         # Track which keys were pressed last frame
         prev_keys = pygame.key.get_pressed()
+
+        self.active_note = None
+        self.active_note_time = 0  # Store the time when the note was activated
 
     # CARICAMENTO IMMAGINE PIANO
 
@@ -100,10 +99,56 @@ class Game:
                 print(sound_height)
                 pygame.time.delay(200)
 
-        # MAPPA TASTI (da sostituire con mouse click)
+
+        # MAPPATURA TASTI e CLICK
+
+            cPoint = [(50, 550), (180, 550), (180, 420), (145, 420), (145, 250), (50, 250)]
+            dbPoint = [(145, 420), (210, 420), (210, 250), (145, 250)]
+            dPoint = [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)]
+            ebPoint = [(275, 420), (340, 420), (340, 250), (275, 250)]
+            ePoint = [(340, 250), (435, 250), (435, 550), (305, 550), (305, 420), (340, 420)]
+            fPoint = [(435, 550), (565, 550), (565, 420), (530, 420), (530, 250), (435, 250)]
+            gbPoint = [(530, 420), (595, 420), (595, 250), (530, 250)]
+            gPoint = [(565, 550), (565, 420), (595, 420), (595, 250), (660, 250), (660, 420), (695, 420), (695, 550)]
+            abPoint = [(660, 420), (725, 420), (725, 250), (660, 250)]
+            aPoint = [(695, 550), (695, 420), (725, 420), (725, 250), (790, 250), (790, 420), (825, 420), (825, 550)]
+            bbPoint = [(790, 420), (855, 420), (855, 250), (790, 250)]
+            bPoint = [(855, 250), (950, 250), (950, 550), (825, 550), (825, 420), (855, 420)]
+
+            cTile = pygame.draw.polygon(self.screen, (25, 120, 60), cPoint, 3)
+            ddTile = pygame.draw.polygon(self.screen, (255, 0, 0), dbPoint, 3)
+            dTile = pygame.draw.polygon(self.screen, (25, 120, 60), dPoint, 3)
+            ebTile = pygame.draw.polygon(self.screen, (255, 0, 0), ebPoint, 3)
+            eTile = pygame.draw.polygon(self.screen, (25, 120, 60), ePoint, 3)
+            fTile = pygame.draw.polygon(self.screen, (25, 120, 60), fPoint, 3)
+            gbTile = pygame.draw.polygon(self.screen, (255, 0, 0), gbPoint, 3)
+            gTile = pygame.draw.polygon(self.screen, (25, 120, 60), gPoint, 3)
+            abTile = pygame.draw.polygon(self.screen, (255, 0, 0), abPoint, 3)
+            aTile = pygame.draw.polygon(self.screen, (25, 120, 60), aPoint, 3)
+            bbTile = pygame.draw.polygon(self.screen, (255, 0, 0), bbPoint, 3)
+            bTile = pygame.draw.polygon(self.screen, (25, 120, 60), bPoint, 3)
+
+            tiles = [
+                (cTile, cPoint, "C"),
+                (ddTile, dbPoint, "Db"),
+                (dTile, dPoint, "D"),
+                (ebTile, ebPoint, "Eb"),
+                (eTile, ePoint, "E"),
+                (fTile, fPoint, "F"),
+                (gbTile, gbPoint, "Gb"),
+                (gTile, gPoint, "G"),
+                (abTile, abPoint, "Ab"),
+                (aTile, aPoint, "A"),
+                (bbTile, bbPoint, "Bb"),
+                (bTile, bPoint, "B"),
+            ]
+
+        
+        # MAPPA TASTI
 
             if key_just_pressed(pygame.K_q):
                 note_name = f"C{sound_height}"
+                self.active_note = (tiles[0][1], tiles[0][2])  # Activate C note
             elif key_just_pressed(pygame.K_2):
                 note_name = f"Db{sound_height}"
             elif key_just_pressed(pygame.K_w):
@@ -127,51 +172,40 @@ class Game:
             elif key_just_pressed(pygame.K_u):
                 note_name = f"B{sound_height}"
             
+            if note_name and note_name in self.sounds:
+                self.sounds[note_name].play()
+
         # TRACKING MOUSE 
 
             if pygame.mouse.get_pressed()[0]:  # Left mouse button
                 pos = pygame.mouse.get_pos()
                 print(pos)
 
-        # PROVA MAPPATURA TASTI e CLICK
+        # GESTIONE PRESSIONE TASTI
 
-            cPoint = [(50, 550), (175, 550), (175, 420), (145, 420), (145, 250), (50, 250)]
-            ddPoint = [(145, 420), (210, 420), (210, 250), (145, 250)]
-            dPoint = [(180, 550), (180, 420), (210, 420), (210, 250), (275, 250), (275, 420), (305, 420), (305, 550)]
+            for tile, points, note in tiles:
+                if tile.collidepoint(pygame.mouse.get_pos()):
+                    if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], points):
+                        note_name = f"{note}{sound_height}"
+                        if note_name in self.sounds:
+                            self.sounds[note_name].play()
+                        print(note)
+                        self.active_note = (points, note)
+                        self.active_note_time = pygame.time.get_ticks()  # Record the activation time
+                        pygame.time.delay(200)
 
-            cTile = pygame.draw.polygon(self.screen, (25, 120, 60), cPoint, 3)
-            ddTile = pygame.draw.polygon(self.screen, (255, 0, 0), ddPoint, 3)
-            dTile = pygame.draw.polygon(self.screen, (25, 120, 60), dPoint, 3)
+            if self.active_note:
+                
+                if pygame.time.get_ticks() - self.active_note_time < 300:
 
-            if cTile.collidepoint(pygame.mouse.get_pos()):
-                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], cPoint):
-                    note_name = f"C{sound_height}"
-                    if note_name in self.sounds:
-                        self.sounds[note_name].play()
-                    print("C")
-                    pygame.time.delay(200)
+                    if self.active_note[1] in ["Db", "Eb", "Gb", "Ab", "Bb"]:
+                        pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (50, 50, 50))
+                    else:
+                        pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (240, 240, 240))
+ 
+                else:
+                    self.active_note = None
 
-            if ddTile.collidepoint(pygame.mouse.get_pos()):
-                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], ddPoint):
-                    note_name = f"Db{sound_height}"
-                    if note_name in self.sounds:
-                        self.sounds[note_name].play()
-                    print("Db")
-                    pygame.time.delay(200)
-            
-            if dTile.collidepoint(pygame.mouse.get_pos()):
-                if pygame.mouse.get_pressed()[0] and self.point_in_polygon(pygame.mouse.get_pos()[0], pygame.mouse.get_pos()[1], dPoint):
-                    note_name = f"D{sound_height}"
-                    if note_name in self.sounds:
-                        self.sounds[note_name].play()
-                    print("D")
-                    pygame.time.delay(200)
-
-        # DISEGNO TASTI PREMUTI 
-
-            """ pygame.gfxdraw.filled_polygon(self.screen, cPoint, (189, 189, 189))
-            pygame.gfxdraw.filled_polygon(self.screen, (255, 0, 0), ddPoint, (189, 189, 189))
-            pygame.gfxdraw.filled_polygon(self.screen, (25, 120, 60), dPoint, (189, 189, 189)) """
 
         # DISPLAY TASTI PREMUTI
 

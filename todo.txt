@@ -1,4 +1,4 @@
-- menù funzionante
+
 - mappatura tasti
 
 pip install pygame-menu -U
