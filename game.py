@@ -3,6 +3,8 @@ import pygame_menu
 import pygame.gfxdraw
 from pygame.locals import *
 import sys
+import os
+import random
 
 class Game:
 
@@ -15,7 +17,7 @@ class Game:
 
         self.res = (1000, 900)
         self.screen = pygame.display.set_mode(self.res)
-        pygame.display.set_caption("Shooter Game")
+        pygame.display.set_caption("Piano Simulator")
         self.clock = pygame.time.Clock()
         self.running = True
 
@@ -29,7 +31,10 @@ class Game:
         for h in range(1, 8):
             for n in self.notes:
                 path = f"piano-mp3/{n}{h}.mp3"
-                self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)       
+                self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)   
+
+        self.meow_sound = pygame.mixer.Sound("cat_sounds/meow.mp3")
+        self.meow_sound.set_volume(0.2)    
 
     # MENU' SETUP
 
@@ -61,8 +66,8 @@ class Game:
 
     # CARICAMENTO IMMAGINE PIANO
 
-        pianoImg = pygame.image.load("images/piano_keys.jpg")
-        pianoImg = pygame.transform.scale(pianoImg, (900, 300))
+        # pianoImg = pygame.image.load("images/piano_keys.jpg")
+        # pianoImg = pygame.transform.scale(pianoImg, (900, 300))
 
     # LOOP PRINCIPALE
 
@@ -76,7 +81,7 @@ class Game:
             self.screen.fill(self.bg)
 
             # Always draw the piano image every frame
-            self.screen.blit(pianoImg, (50, 250))
+            # self.screen.blit(pianoImg, (50, 250))
 
         # GESTIONE e DISPLAY INPUT 
 
@@ -115,18 +120,30 @@ class Game:
             bbPoint = [(790, 420), (855, 420), (855, 250), (790, 250)]
             bPoint = [(855, 250), (950, 250), (950, 550), (825, 550), (825, 420), (855, 420)]
 
-            cTile = pygame.draw.polygon(self.screen, (25, 120, 60), cPoint, 3)
-            ddTile = pygame.draw.polygon(self.screen, (255, 0, 0), dbPoint, 3)
-            dTile = pygame.draw.polygon(self.screen, (25, 120, 60), dPoint, 3)
-            ebTile = pygame.draw.polygon(self.screen, (255, 0, 0), ebPoint, 3)
-            eTile = pygame.draw.polygon(self.screen, (25, 120, 60), ePoint, 3)
-            fTile = pygame.draw.polygon(self.screen, (25, 120, 60), fPoint, 3)
-            gbTile = pygame.draw.polygon(self.screen, (255, 0, 0), gbPoint, 3)
-            gTile = pygame.draw.polygon(self.screen, (25, 120, 60), gPoint, 3)
-            abTile = pygame.draw.polygon(self.screen, (255, 0, 0), abPoint, 3)
-            aTile = pygame.draw.polygon(self.screen, (25, 120, 60), aPoint, 3)
-            bbTile = pygame.draw.polygon(self.screen, (255, 0, 0), bbPoint, 3)
-            bTile = pygame.draw.polygon(self.screen, (25, 120, 60), bPoint, 3)
+            cTile = pygame.draw.polygon(self.screen, (255, 255, 255), cPoint)  # Fill color
+            pygame.draw.polygon(self.screen, (0, 0, 0), cPoint, 2)  # Border color
+            ddTile = pygame.draw.polygon(self.screen, (0, 0, 0), dbPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), dbPoint, 2)
+            dTile = pygame.draw.polygon(self.screen, (255, 255, 255), dPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), dPoint, 2)
+            ebTile = pygame.draw.polygon(self.screen, (0, 0, 0), ebPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), ebPoint, 2)
+            eTile = pygame.draw.polygon(self.screen, (255, 255, 255), ePoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), ePoint, 2)
+            fTile = pygame.draw.polygon(self.screen, (255, 255, 255), fPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), fPoint, 2)
+            gbTile = pygame.draw.polygon(self.screen, (0, 0, 0), gbPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), gbPoint, 2)
+            gTile = pygame.draw.polygon(self.screen, (255, 255, 255), gPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), gPoint, 2)
+            abTile = pygame.draw.polygon(self.screen, (0, 0, 0), abPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), abPoint, 2)
+            aTile = pygame.draw.polygon(self.screen, (255, 255, 255), aPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), aPoint, 2)
+            bbTile = pygame.draw.polygon(self.screen, (0, 0, 0), bbPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), bbPoint, 2)
+            bTile = pygame.draw.polygon(self.screen, (255, 255, 255), bPoint)
+            pygame.draw.polygon(self.screen, (0, 0, 0), bPoint, 2)
 
             tiles = [
                 (cTile, cPoint, "C"),
@@ -199,9 +216,13 @@ class Game:
                 if pygame.time.get_ticks() - self.active_note_time < 300:
 
                     if self.active_note[1] in ["Db", "Eb", "Gb", "Ab", "Bb"]:
-                        pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (50, 50, 50))
+                        pygame.draw.polygon(self.screen, (50, 50, 50), self.active_note[0])  # Fill color
+                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)  # Border color
+                        # pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (50, 50, 50))
                     else:
-                        pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (240, 240, 240))
+                        pygame.draw.polygon(self.screen, (240, 240, 240), self.active_note[0])  # Fill color
+                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)  # Border color
+                        # pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (240, 240, 240))
  
                 else:
                     self.active_note = None
@@ -211,10 +232,15 @@ class Game:
 
             # Always render the current note name (or blank if none)
             # Accumulate all played notes in a string
+            
+
             if not hasattr(self, "played_notes"):
                 self.played_notes = ""
+
             if note_name:
                 self.played_notes += note_name + " "
+            elif len(self.played_notes)>10:
+                self.played_notes = self.played_notes[-10*3:]  # Keep last 10 notes (assuming 2 chars + space each)
 
             display_notes = self.played_notes.strip()
 
@@ -224,7 +250,22 @@ class Game:
 
             prev_keys = keys  # Update previous keys for next frame
 
+
+        # CRAZY CAT SECTION WOHOO
+
+            if not hasattr(self, "cat_image"):
+                cats = len([name for name in os.listdir('cat_images') if name.endswith('.png') and os.path.isfile(os.path.join('cat_images', name))])  # number of .png files in the cat_images folder
+                selected_cat = random.randint(1, cats)
+                self.cat_image = pygame.image.load(f"cat_images/cat{selected_cat}.png")
+                self.cat_image = pygame.transform.scale(self.cat_image, (200, 200))
+            
+            self.screen.blit(self.cat_image, (self.width - 250, 50))
+
+            if keys[pygame.K_c]:
+                self.meow_sound.play()
+
             pygame.display.update()
+
 
 # FUNZIONE PER CAPIRE SE UN PUNTO FA PARTE DELLA NOTA
 
@@ -238,6 +279,7 @@ class Game:
                 c = not c
             j = i
         return c
+
 
 # LOOP MENU
 
