@@ -1,6 +1,5 @@
 import pygame
 import pygame_menu
-import pygame.gfxdraw
 from pygame.locals import *
 import sys
 import os
@@ -12,7 +11,7 @@ class Game:
 
     def __init__(self):
         pygame.init()
-        pygame.mixer.init()
+        pygame.mixer.init(frequency=44100, size=-16, channels=2, buffer=512)
         pygame.mixer.set_num_channels(32)  # Allow up to 32 overlapping sounds
 
         self.res = (1000, 900)
@@ -21,7 +20,7 @@ class Game:
         self.clock = pygame.time.Clock()
         self.running = True
 
-        self.bg = (180, 191, 209)
+        self.bg = (89, 115, 158)
         self.width = self.screen.get_width()
         self.height = self.screen.get_height()
 
@@ -34,18 +33,40 @@ class Game:
                 self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)   
 
         self.meow_sound = pygame.mixer.Sound("cat_sounds/meow.mp3")
-        self.meow_sound.set_volume(0.2)    
+        self.meow_sound.set_volume(0.3)    
 
     # MENU' SETUP
-
-        self.menu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
-                                    theme=pygame_menu.themes.THEME_DARK)
         
-        self.menu.add.button('Play', self.play, font_size=30, font_color=(0, 0, 0), 
+        self.theme = pygame_menu.themes.Theme(
+            title_background_color=(115, 143, 189),
+            title_bar_style=pygame_menu.widgets.MENUBAR_STYLE_UNDERLINE,
+            title_font_shadow=False,
+            widget_font=pygame_menu.font.FONT_MUNRO,
+            widget_font_color=(0, 0, 0),
+            background_color=(89, 115, 158),
+            )
+
+        self.creditsMenu = pygame_menu.Menu('Credits', 600, 600,
+                                    theme=self.theme)
+        
+        self.creditsMenu.add.label('Developed by Elio and Giovanni', font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
-        self.menu.add.button('Quit', pygame_menu.events.EXIT, font_size=30, font_color=(0, 0, 0), 
+        
+
+        self.homeMenu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
+                                    theme=self.theme)
+        
+        self.homeMenu.add.button('Play', self.play, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        self.homeMenu.add.button(self.creditsMenu.get_title(), self.creditsMenu, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        self.homeMenu.add.button('Quit', pygame_menu.events.EXIT, font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
@@ -63,6 +84,8 @@ class Game:
 
         self.active_note = None
         self.active_note_time = 0  # Store the time when the note was activated
+
+        self.catHitbox = pygame.draw.rect(self.screen, (0, 0, 0), (self.width - 250, 50, 200, 200), 2)
 
     # CARICAMENTO IMMAGINE PIANO
 
@@ -91,6 +114,10 @@ class Game:
             # Only play sound on key DOWN event (not while held)
             def key_just_pressed(key):
                 return keys[key] and not prev_keys[key]
+
+            if keys[pygame.K_ESCAPE]:
+                self.homeMenu.reset(1)
+                run = False
 
             if keys[pygame.K_RIGHT]:
                 if sound_height < 7:
@@ -261,8 +288,19 @@ class Game:
             
             self.screen.blit(self.cat_image, (self.width - 250, 50))
 
+            title = font.render("Press C to meow!", True, (0, 0, 0))
+            title_rect = title.get_rect(center=(self.width - 150, 50))
+            self.screen.blit(title, title_rect)
+            
             if keys[pygame.K_c]:
+                self.meow_sound.stop()
                 self.meow_sound.play()
+                pygame.time.delay(300)
+
+            if pygame.mouse.get_pressed()[0] and self.catHitbox.collidepoint(pygame.mouse.get_pos()):
+                self.meow_sound.stop()
+                self.meow_sound.play()
+                pygame.time.delay(300)
 
             pygame.display.update()
 
@@ -290,7 +328,7 @@ class Game:
                     self.running = False
 
             self.screen.fill(self.bg)
-            self.menu.mainloop(self.screen)
+            self.homeMenu.mainloop(self.screen)
             pygame.display.flip()
 
         pygame.quit()
