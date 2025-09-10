@@ -46,6 +46,8 @@ class Game:
             background_color=(89, 115, 158),
             )
 
+    # CREDITS MENU
+
         self.creditsMenu = pygame_menu.Menu('Credits', 600, 600,
                                     theme=self.theme)
         
@@ -53,12 +55,33 @@ class Game:
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
+    
+    # CONTROLS MENU
+        self.controlsMenu = pygame_menu.Menu('Controls', 600, 600,
+                                    theme=self.theme)
+        
+        self.controlsMenu.add.label('Left click the mouse ore use the keyboard:', font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        
+        self.controlsMenu.add.image('images\piano_keys.jpg', scale=(0.5, 0.5))
+
+        self.controlsMenu.add.label('Use left and right arrow to change the piano\'s octave', font_size=25, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
         
 
+    # HOME MENU
         self.homeMenu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
                                     theme=self.theme)
         
         self.homeMenu.add.button('Play', self.play, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        self.homeMenu.add.button(self.controlsMenu.get_title(), self.controlsMenu, font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
@@ -86,11 +109,6 @@ class Game:
         self.active_note_time = 0  # Store the time when the note was activated
 
         self.catHitbox = pygame.draw.rect(self.screen, (0, 0, 0), (self.width - 250, 50, 200, 200), 2)
-
-    # CARICAMENTO IMMAGINE PIANO
-
-        # pianoImg = pygame.image.load("images/piano_keys.jpg")
-        # pianoImg = pygame.transform.scale(pianoImg, (900, 300))
 
     # LOOP PRINCIPALE
 
@@ -189,34 +207,30 @@ class Game:
 
         
         # MAPPA TASTI
-
-            if key_just_pressed(pygame.K_q):
-                note_name = f"C{sound_height}"
-                self.active_note = (tiles[0][1], tiles[0][2])  # Activate C note
-            elif key_just_pressed(pygame.K_2):
-                note_name = f"Db{sound_height}"
-            elif key_just_pressed(pygame.K_w):
-                note_name = f"D{sound_height}"
-            elif key_just_pressed(pygame.K_3):
-                note_name = f"Eb{sound_height}"
-            elif key_just_pressed(pygame.K_e):
-                note_name = f"E{sound_height}"
-            elif key_just_pressed(pygame.K_r):
-                note_name = f"F{sound_height}"
-            elif key_just_pressed(pygame.K_5):
-                note_name = f"Gb{sound_height}"
-            elif key_just_pressed(pygame.K_t):
-                note_name = f"G{sound_height}"
-            elif key_just_pressed(pygame.K_6):
-                note_name = f"Ab{sound_height}"
-            elif key_just_pressed(pygame.K_y):
-                note_name = f"A{sound_height}"
-            elif key_just_pressed(pygame.K_7):
-                note_name = f"Bb{sound_height}"
-            elif key_just_pressed(pygame.K_u):
-                note_name = f"B{sound_height}"
             
-            if note_name and note_name in self.sounds:
+            if len(tiles) >= 12:
+                key_note_map = [
+                    (pygame.K_q, "C", 0),
+                    (pygame.K_2, "Db", 1),
+                    (pygame.K_w, "D", 2),
+                    (pygame.K_3, "Eb", 3),
+                    (pygame.K_e, "E", 4),
+                    (pygame.K_r, "F", 5),
+                    (pygame.K_5, "Gb", 6),
+                    (pygame.K_t, "G", 7),
+                    (pygame.K_6, "Ab", 8),
+                    (pygame.K_y, "A", 9),
+                    (pygame.K_7, "Bb", 10),
+                    (pygame.K_u, "B", 11),
+                ]
+                for key, note, idx in key_note_map:
+                    if key_just_pressed(key):
+                        note_name = f"{note}{sound_height}"
+                        self.active_note = (tiles[idx][1], tiles[idx][2])
+                        self.active_note_time = pygame.time.get_ticks()
+                        print(f"Key pressed: {note_name}")
+
+            if note_name in self.sounds:
                 self.sounds[note_name].play()
 
         # TRACKING MOUSE 
@@ -235,7 +249,7 @@ class Game:
                             self.sounds[note_name].play()
                         print(note)
                         self.active_note = (points, note)
-                        self.active_note_time = pygame.time.get_ticks()  # Record the activation time
+                        self.active_note_time = pygame.time.get_ticks()
                         pygame.time.delay(200)
 
             if self.active_note:
@@ -243,12 +257,12 @@ class Game:
                 if pygame.time.get_ticks() - self.active_note_time < 300:
 
                     if self.active_note[1] in ["Db", "Eb", "Gb", "Ab", "Bb"]:
-                        pygame.draw.polygon(self.screen, (50, 50, 50), self.active_note[0])  # Fill color
-                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)  # Border color
+                        pygame.draw.polygon(self.screen, (50, 50, 50), self.active_note[0])
+                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)
                         # pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (50, 50, 50))
                     else:
-                        pygame.draw.polygon(self.screen, (240, 240, 240), self.active_note[0])  # Fill color
-                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)  # Border color
+                        pygame.draw.polygon(self.screen, (240, 240, 240), self.active_note[0])
+                        pygame.draw.polygon(self.screen, (0, 0, 0), self.active_note[0], 2)
                         # pygame.gfxdraw.filled_polygon(self.screen, self.active_note[0], (240, 240, 240))
  
                 else:
@@ -257,19 +271,21 @@ class Game:
 
         # DISPLAY TASTI PREMUTI
 
-            # Always render the current note name (or blank if none)
-            # Accumulate all played notes in a string
-            
-
             if not hasattr(self, "played_notes"):
-                self.played_notes = ""
+                self.played_notes = []  # List of (note_name, timestamp) tuples
+
+            current_time = pygame.time.get_ticks()
 
             if note_name:
-                self.played_notes += note_name + " "
-            elif len(self.played_notes)>10:
-                self.played_notes = self.played_notes[-10*3:]  # Keep last 10 notes (assuming 2 chars + space each)
+                self.played_notes.append((note_name, current_time))
 
-            display_notes = self.played_notes.strip()
+
+            self.played_notes = [
+                (n, t) for (n, t) in self.played_notes if current_time - t < 2500
+            ]
+
+            # Build display string from remaining notes
+            display_notes = " ".join(n for (n, t) in self.played_notes)
 
             title = font.render(display_notes, True, (0, 0, 0))
             title_rect = title.get_rect(center=(self.width / 2, self.height / 2 - 225))
@@ -280,7 +296,7 @@ class Game:
 
         # CRAZY CAT SECTION WOHOO
 
-            if not hasattr(self, "cat_image"):
+            """ if not hasattr(self, "cat_image"):
                 cats = len([name for name in os.listdir('cat_images') if name.endswith('.png') and os.path.isfile(os.path.join('cat_images', name))])  # number of .png files in the cat_images folder
                 selected_cat = random.randint(1, cats)
                 self.cat_image = pygame.image.load(f"cat_images/cat{selected_cat}.png")
@@ -300,8 +316,25 @@ class Game:
             if pygame.mouse.get_pressed()[0] and self.catHitbox.collidepoint(pygame.mouse.get_pos()):
                 self.meow_sound.stop()
                 self.meow_sound.play()
-                pygame.time.delay(300)
+                pygame.time.delay(300) """
 
+        # PULSANTE MENU
+            menu_button_rect = pygame.Rect(10, 10, 120, 40)
+            pygame.draw.rect(self.screen, (180, 191, 209), menu_button_rect, border_radius=10)
+            pygame.draw.rect(self.screen, (0, 0, 0), menu_button_rect, 2, border_radius=10)
+            button_font = pygame.font.Font(None, 36)
+            button_text = button_font.render("Menu", True, (0, 0, 0))
+            text_rect = button_text.get_rect(center=menu_button_rect.center)
+            self.screen.blit(button_text, text_rect)
+
+            
+            if pygame.mouse.get_pressed()[0] and menu_button_rect.collidepoint(pygame.mouse.get_pos()):
+                self.homeMenu.reset(1)
+                return
+
+        # PULSANTE OTTAVA
+            octave_text = font.render(f"Octave: {sound_height}", True, (0, 0, 0))
+            self.screen.blit(octave_text, (self.width - 200, self.height - 300))
             pygame.display.update()
 
 
