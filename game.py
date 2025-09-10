@@ -60,7 +60,7 @@ class Game:
         self.controlsMenu = pygame_menu.Menu('Controls', 600, 600,
                                     theme=self.theme)
         
-        self.controlsMenu.add.label('Left click the mouse ore use the keyboard:', font_size=30, font_color=(0, 0, 0), 
+        self.controlsMenu.add.label('Left click the mouse or use the keyboard:', font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))

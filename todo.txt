@@ -1,4 +1,6 @@
+pip install pygame
+pip install pygame-menu
 
-- mappatura tasti
-
-pip install pygame-menu -U
+- menu impostazioni
+- backgrounds
+- cat mode (per una futura versione)
