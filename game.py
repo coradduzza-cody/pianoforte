@@ -23,6 +23,8 @@ class Game:
         self.bg = (89, 115, 158)
         self.width = self.screen.get_width()
         self.height = self.screen.get_height()
+        self.onchange = 0.5
+        self.prevChange = self.onchange
 
         # Preload all notes for all heights
         self.sounds = {}
@@ -31,9 +33,10 @@ class Game:
             for n in self.notes:
                 path = f"piano-mp3/{n}{h}.mp3"
                 self.sounds[f"{n}{h}"] = pygame.mixer.Sound(path)   
+                self.sounds[f"{n}{h}"].set_volume(self.onchange)  # Set default volume to 50%
 
-        self.meow_sound = pygame.mixer.Sound("cat_sounds/meow.mp3")
-        self.meow_sound.set_volume(0.3)    
+        """ self.meow_sound = pygame.mixer.Sound("cat_sounds/meow.mp3")
+        self.meow_sound.set_volume(0.3)   """  
 
     # MENU' SETUP
         
@@ -71,8 +74,35 @@ class Game:
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
+    
+    # SETTINGS MENU
+        self.settingsMenu = pygame_menu.Menu('Settings', 600, 600,
+                                    theme=self.theme)
         
+        self.settingsMenu.add.label('Audio', font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        def set_volume(value):
+            self.onchange = value / 100
+            for sound in self.sounds.values():
+                sound.set_volume(self.onchange)
+            self.prevChange = self.onchange
 
+        self.settingsMenu.add.range_slider(
+            'Volume: ',
+            default=int(self.onchange * 100),
+            range_values=(0, 100),
+            increment=5,
+            value_format=lambda x: str(int(x)) + '%',
+            font_size=25,
+            font_color=(0, 0, 0),
+            background_color=(180, 191, 209),
+            margin=(0, 20),
+            padding=(10, 20),
+            onchange=set_volume
+        )
+        
     # HOME MENU
         self.homeMenu = pygame_menu.Menu('PIANO SIMULATOR', 600, 600,
                                     theme=self.theme)
@@ -82,6 +112,10 @@ class Game:
                              ,margin=(0, 20)
                              ,padding=(10, 20))
         self.homeMenu.add.button(self.controlsMenu.get_title(), self.controlsMenu, font_size=30, font_color=(0, 0, 0), 
+                             background_color=(180, 191, 209)
+                             ,margin=(0, 20)
+                             ,padding=(10, 20))
+        self.homeMenu.add.button(self.settingsMenu.get_title(), self.settingsMenu, font_size=30, font_color=(0, 0, 0), 
                              background_color=(180, 191, 209)
                              ,margin=(0, 20)
                              ,padding=(10, 20))
