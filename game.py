@@ -146,8 +146,8 @@ class Game:
 
     def play(self):
         run = True
-        sound_height = 4                    #primo pianoforte
-        sound_height2 = sound_height + 1    #secondo pianoforte
+        sound_height = 4                    # primo pianoforte
+        sound_height2 = sound_height - 1    # secondo pianoforte (one octave lower)
 
         font = pygame.font.Font(None, 50)
 
@@ -183,16 +183,16 @@ class Game:
 
             # Octave change logic
             if keys[pygame.K_RIGHT]:
-                if sound_height < 6: 
+                if sound_height < 7:  # allow up to octave 7, so second piano can be 6
                     sound_height += 1
-                    sound_height2 = sound_height + 1
+                    sound_height2 = sound_height - 1
                 print(sound_height)
                 pygame.time.delay(200)
 
             if keys[pygame.K_LEFT]:
-                if sound_height > 1:
+                if sound_height > 2:  # minimum is 2, so second piano can be 1
                     sound_height -= 1
-                    sound_height2 = sound_height + 1
+                    sound_height2 = sound_height - 1
                 print(sound_height)
                 pygame.time.delay(200)
 
@@ -450,9 +450,22 @@ class Game:
             text_rect = button_text.get_rect(center=menu_button_rect.center)
             self.screen.blit(button_text, text_rect)
 
+        # SETTINGS MENU
+            settings_button_rect = pygame.Rect(150, 10, 40, 40)
+            pygame.draw.rect(self.screen, (180, 191, 209), settings_button_rect, border_radius=10)
+            pygame.draw.rect(self.screen, (0, 0, 0), settings_button_rect, 2, border_radius=10)
+            button_image = pygame.image.load("images/settings.png")
+            button_image = pygame.transform.scale(button_image, (30, 30))
+            button_image_rect = button_image.get_rect(center=settings_button_rect.center)
+            self.screen.blit(button_image, button_image_rect)
+
             
             if pygame.mouse.get_pressed()[0] and menu_button_rect.collidepoint(pygame.mouse.get_pos()):
                 self.homeMenu.reset(1)
+                return
+            
+            if pygame.mouse.get_pressed()[0] and settings_button_rect.collidepoint(pygame.mouse.get_pos()):
+                self.settingsMenu.reset(1)
                 return
 
         # PULSANTE OTTAVA
